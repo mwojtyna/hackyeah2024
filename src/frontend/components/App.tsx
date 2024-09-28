@@ -1,6 +1,14 @@
 import { useState } from "react";
+import { EnterUrlScreen } from "./EnterUrl";
+import { State } from "../../types/State";
 
 export function App() {
-    const [count, setCount] = useState(0);
-    return <button onClick={() => setCount((count) => count + 1)}>{count}</button>;
+    const [state, setState] = useState(new State());
+
+    switch (state.currentView) {
+        case 'enterURL':
+            return <EnterUrlScreen state={state} updateState={setState} />;
+        default:
+            return 'nosuchfile'
+    }
 }
