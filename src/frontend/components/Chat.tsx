@@ -9,6 +9,11 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { cn } from "../utils";
 import { Layout } from "@/types/shared";
 
+type ChatBubble = {
+    message: string;
+    sender: "user" | "ai";
+};
+
 export function Chat({
     state,
     updateState,
@@ -23,37 +28,48 @@ export function Chat({
     }, []);
 
     const [input, setInput] = useState("");
+    const [bubbles, setBubbles] = useState<ChatBubble[]>([]);
     const mutation = useMutation({
-        mutationFn: async (msg: string) => window.api.sendChatMessage(msg),
+        mutationFn: async (msg: string) => {
+            setInput("");
+            setBubbles((bubbles) => [...bubbles, { message: msg, sender: "user" }]);
+            return window.api.sendChatMessage(msg);
+        },
         onSuccess: (res) => {
-            console.log(res);
+            setBubbles((bubbles) => [...bubbles, { message: res, sender: "ai" }]);
         },
     });
 
     return (
         <div
             className={cn(
-                "flex h-full w-full flex-col p-4 gap-4 justify-between",
+                "flex h-full w-full flex-col p-4 justify-between",
                 layout == "landscape" ? "border-r" : "border-t",
             )}
         >
-            <div>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas tristique commodo
-                semper. Nam cursus in quam quis interdum. Curabitur malesuada sem lacus, in
-                porttitor ex feugiat consequat. Phasellus ipsum diam, ullamcorper eget augue ac,
-                faucibus aliquam risus. Nam mollis sodales quam et mattis. Integer orci diam,
-                pulvinar sed dolor id, lobortis dapibus magna. Praesent sed lorem ipsum.
-                Pellentesque rhoncus ex sed lacus auctor eleifend eu eget velit. Cras ac massa nec
-                erat aliquam feugiat ac non est. In lobortis tincidunt mattis. Sed vitae augue eu
-                quam facilisis sollicitudin in id arcu. Nulla elementum turpis nec mi eleifend
-                commodo. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per
-                inceptos himenaeos. Quisque feugiat tristique laoreet.
+            <div className="flex flex-col max-h-[80%] gap-4 overflow-auto">
+                {bubbles.map((bubble, i) => {
+                    return (
+                        <div
+                            key={i}
+                            className={cn(
+                                "px-4 py-2 text-white rounded-lg whitespace-pre-line",
+                                bubble.sender === "user" ? "bg-gray-600" : "bg-stone-900",
+                                bubble.sender === "user" ? "ml-auto" : "mr-auto",
+                            )}
+                        >
+                            <p>{bubble.message}</p>
+                        </div>
+                    );
+                })}
             </div>
 
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
-                    mutation.mutate(input);
+                    if (input.trim() !== "") {
+                        mutation.mutate(input);
+                    }
                 }}
                 className="mb-7 overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring"
             >
@@ -68,7 +84,9 @@ export function Chat({
                     onKeyDown={(e) => {
                         if (e.key == "Enter" && !e.shiftKey) {
                             e.preventDefault();
-                            mutation.mutate(input);
+                            if (input.trim() !== "") {
+                                mutation.mutate(input);
+                            }
                         }
                     }}
                     onChange={(e) => setInput(e.currentTarget.value)}
