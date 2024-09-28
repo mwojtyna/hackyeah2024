@@ -106,7 +106,8 @@ function createWindow() {
     });
 
     // Open the DevTools.
-    // mainWindow.webContents.openDevTools();
+    uiView.webContents.openDevTools({ mode: "detach" });
+    // embedView.webContents.openDevTools({ mode: "detach" });
 
     function landscape(window: BaseWindow, uiSize: number): boolean {
         return uiSize < window.getSize()[0] / 2;
