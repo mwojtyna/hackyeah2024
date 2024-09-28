@@ -133,8 +133,7 @@ function layoutViews(
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
     const { mainWindow, uiView, embedView } = createWindow();
-    ipcMain.on("send-initial-url", (_, a0) => {
-        const url = a0 as string;
+    ipcMain.on("send-initial-url", (_, url: string) => {
         uiView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
         embedView.setBounds({
             x: 0,
@@ -145,14 +144,20 @@ app.on("ready", () => {
         embedView.webContents.loadURL(url);
         embedView.webContents.on("dom-ready", async () => {
             uiView.webContents.send("url-loaded");
-            const websiteText = await embedView.webContents.executeJavaScript('document.body.innerText')
-            const res1 = await website_search_summary("find me a contact information for the event organizers", websiteText)
-            console.log(res1);
-            //const res2 = await extract_info_json("find me a contact info for a mentor support", res1)
-            //console.log("res2", res2);
         });
         layoutViews(mainWindow, uiView, embedView);
         frontendState.currentView = "chatWithWebPage";
+    });
+    ipcMain.handle("send-chat-message", async (_, prompt: string) => {
+        console.log("send-chat-message");
+        const websiteText =
+            await embedView.webContents.executeJavaScript("document.body.innerText");
+        const res1 = await website_search_summary(prompt, websiteText);
+        console.log("send-chat-message response");
+        return res1;
+        // console.log(res1);
+        //const res2 = await extract_info_json("find me a contact info for a mentor support", res1)
+        //console.log("res2", res2);
     });
 });
 

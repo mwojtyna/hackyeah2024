@@ -24,12 +24,9 @@ export function Chat({
 
     const [input, setInput] = useState("");
     const mutation = useMutation({
-        mutationFn: (msg: string) =>
-            new Promise(() => {
-                console.log("mutation");
-            }),
-        onMutate: () => {
-            console.log("onmutation");
+        mutationFn: async (msg: string) => window.api.sendChatMessage(msg),
+        onSuccess: (res) => {
+            console.log(res);
         },
     });
 
