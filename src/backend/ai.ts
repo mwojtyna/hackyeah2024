@@ -21,8 +21,8 @@ async function ask(recipe: string, prompt: string, config: {} = {}) {
 	).message.content;
 }
 
-async function ask_stream(recipe: string, prompt: string, config: {} = {}) {
-	return await ollama.chat({
+async function* ask_stream(recipe: string, prompt: string, config: {} = {}) {
+	const response = await ollama.chat({
 		model: "llama3.2",
 		stream: true,
 		...config,
@@ -37,6 +37,10 @@ async function ask_stream(recipe: string, prompt: string, config: {} = {}) {
 			},
 		],
 	});
+
+	for await (const part of response) {
+		yield part.message.content;
+	}
 }
 
 export async function evaluate_urls(
@@ -64,11 +68,14 @@ export async function improve_user_request(request: string): Promise<string> {
 	return await ask(recipe, request);
 }
 
-export async function website_search_summary(prompt: string, website: string) {
+export async function* website_search_summary(
+	prompt: string,
+	website: string,
+): AsyncGenerator<string> {
 	const recipe = (await import(`./prompts/website_search_summary.md?raw`))
 		.default;
 
-	return await ask_stream(
+	return ask_stream(
 		recipe,
 		JSON.stringify({
 			prompt,
