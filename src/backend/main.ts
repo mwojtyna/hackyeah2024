@@ -71,8 +71,10 @@ function createWindow(): {
     });
 
     // Open the DevTools.
-    uiView.webContents.openDevTools({ mode: "detach" });
-    //embedView.webContents.openDevTools({ mode: "detach" });
+    if (process.env.NODE_ENV !== "Release") {
+        uiView.webContents.openDevTools({ mode: "detach" });
+        //embedView.webContents.openDevTools({ mode: "detach" });
+    }
 
     return {
         mainWindow,
