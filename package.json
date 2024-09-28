@@ -38,6 +38,6 @@
     "license": "MIT",
     "dependencies": {
         "electron-squirrel-startup": "^1.0.1",
-        "llamaai": "^1.0.4"
+        "ollama": "^0.5.9"
     }
 }
