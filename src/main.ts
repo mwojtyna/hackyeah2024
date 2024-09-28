@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, WebContentsView } from "electron";
 import path from "path";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -6,11 +6,14 @@ if (require("electron-squirrel-startup")) {
     app.quit();
 }
 
-const createWindow = () => {
+function createWindow() {
+    const WIDTH = 800;
+    const HEIGHT = 800;
+
     // Create the browser window.
     const mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: WIDTH,
+        height: HEIGHT,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
         },
@@ -28,9 +31,14 @@ const createWindow = () => {
         );
     }
 
+    const embedView = new WebContentsView();
+    mainWindow.contentView.addChildView(embedView);
+    embedView.webContents.loadURL("https://google.pl");
+    embedView.setBounds({ x: 0, y: 0, width: WIDTH, height: HEIGHT });
+
     // Open the DevTools.
-    mainWindow.webContents.openDevTools();
-};
+    // mainWindow.webContents.openDevTools();
+}
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
