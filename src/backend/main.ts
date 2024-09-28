@@ -1,5 +1,6 @@
 import { Layout } from "@/types/shared";
 import { app, BrowserWindow, ipcMain, WebContentsView } from "electron";
+import { extract_info_json, website_search_summary } from "@/backend/ai";
 import path from "path";
 import { State } from "../types/state";
 
@@ -142,8 +143,13 @@ app.on("ready", () => {
             height: mainWindow.getSize()[1],
         });
         embedView.webContents.loadURL(url);
-        embedView.webContents.on("dom-ready", () => {
+        embedView.webContents.on("dom-ready", async () => {
             uiView.webContents.send("url-loaded");
+            const websiteText = await embedView.webContents.executeJavaScript('document.body.innerText')
+            const res1 = await website_search_summary("find me a contact information for the event organizers", websiteText)
+            console.log(res1);
+            //const res2 = await extract_info_json("find me a contact info for a mentor support", res1)
+            //console.log("res2", res2);
         });
         layoutViews(mainWindow, uiView, embedView);
         frontendState.currentView = "chatWithWebPage";
