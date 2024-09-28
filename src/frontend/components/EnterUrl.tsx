@@ -1,9 +1,14 @@
-import React, { useRef } from "react"
-import { State } from "../../types/State"
+import React, { useRef } from "react";
+import { State } from "../../types/State";
 
-
-export function EnterUrlScreen({ state, updateState }: { state: State, updateState: React.Dispatch<React.SetStateAction<State>> }) {
-    const inputRef = useRef<HTMLInputElement | null>(null)
+export function EnterUrlScreen({
+    state,
+    updateState,
+}: {
+    state: State;
+    updateState: React.Dispatch<React.SetStateAction<State>>;
+}) {
+    const inputRef = useRef<HTMLInputElement | null>(null);
     return (
         <div className="w-screen h-screen flex flex-col justify-center items-center">
             <h1 className="mx-auto text-6xl font-bold">Better Web</h1>
@@ -12,13 +17,13 @@ export function EnterUrlScreen({ state, updateState }: { state: State, updateSta
                     className="h-16 min-w-64 text-4xl rounded-md p-2 border border-black border-2"
                     ref={inputRef}
                     onKeyDown={(e) => {
-                        if (e.key == 'Enter') {
+                        if (e.key == "Enter") {
                             try {
-                                state.webPageURL = new URL(e.currentTarget.value)
+                                state.webPageURL = new URL(e.currentTarget.value);
                             } catch {
-                                console.error('wrong url')
+                                console.error("wrong url");
                             }
-                            updateState({ ...state })
+                            updateState({ ...state });
                         }
                     }}
                     placeholder="https://google.com"
@@ -27,14 +32,16 @@ export function EnterUrlScreen({ state, updateState }: { state: State, updateSta
                     className="h-16 w-16 rounded-md border border-black border-2"
                     onClick={() => {
                         try {
-                            state.webPageURL = new URL(inputRef.current.value)
+                            state.webPageURL = new URL(inputRef.current.value);
                         } catch {
-                            console.error('wrong url')
+                            console.error("wrong url");
                         }
-                        updateState({ ...state })
+                        updateState({ ...state });
                     }}
-                >ENT</button>
+                >
+                    ENT
+                </button>
             </div>
         </div>
-    )
+    );
 }
