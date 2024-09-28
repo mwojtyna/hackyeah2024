@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { CornerDownLeft, Mic } from "lucide-react";
+import { CornerDownLeft, LoaderCircle, Mic } from "lucide-react";
 import { useEffect, useState } from "react";
 import { State } from "@/types/state";
 import { Button } from "./ui/button";
@@ -48,20 +48,30 @@ export function Chat({
             )}
         >
             <div className="flex flex-col max-h-[80%] gap-4 overflow-auto">
-                {bubbles.map((bubble, i) => {
-                    return (
-                        <div
-                            key={i}
-                            className={cn(
-                                "px-4 py-2 text-white rounded-lg whitespace-pre-line",
-                                bubble.sender === "user" ? "bg-gray-600" : "bg-stone-900",
-                                bubble.sender === "user" ? "ml-auto" : "mr-auto",
-                            )}
-                        >
-                            <p>{bubble.message}</p>
-                        </div>
-                    );
-                })}
+                {bubbles.map((bubble, i) => (
+                    <div
+                        key={i}
+                        className={cn(
+                            "px-4 py-2 text-white rounded-lg whitespace-pre-line",
+                            bubble.sender === "user" ? "bg-gray-600" : "bg-stone-900",
+                            bubble.sender === "user" ? "ml-auto" : "mr-auto",
+                        )}
+                    >
+                        <p>{bubble.message}</p>
+                    </div>
+                ))}
+
+                {mutation.isPending && (
+                    <div
+                        className={cn(
+                            "px-4 py-2 text-white rounded-lg whitespace-pre-line",
+                            "bg-stone-900",
+                            "mr-auto",
+                        )}
+                    >
+                        <p>...</p>
+                    </div>
+                )}
             </div>
 
             <form
@@ -71,7 +81,7 @@ export function Chat({
                         mutation.mutate(input);
                     }
                 }}
-                className="mb-7 overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring"
+                className="overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring"
             >
                 <Label htmlFor="message" className="sr-only">
                     Message
@@ -84,7 +94,7 @@ export function Chat({
                     onKeyDown={(e) => {
                         if (e.key == "Enter" && !e.shiftKey) {
                             e.preventDefault();
-                            if (input.trim() !== "") {
+                            if (input.trim() !== "" && !mutation.isPending) {
                                 mutation.mutate(input);
                             }
                         }
@@ -101,9 +111,18 @@ export function Chat({
                         </TooltipTrigger>
                         <TooltipContent side="top">Use Microphone</TooltipContent>
                     </Tooltip>
-                    <Button type="submit" size="sm" className="ml-auto gap-1.5">
+                    <Button
+                        type="submit"
+                        size="sm"
+                        className="ml-auto gap-1.5 disabled:opacity-50"
+                        disabled={mutation.isPending}
+                    >
                         Send Message
-                        <CornerDownLeft className="size-3.5" />
+                        {mutation.isPending ? (
+                            <LoaderCircle className="animate-spin size-3.5" />
+                        ) : (
+                            <CornerDownLeft className="size-3.5" />
+                        )}
                     </Button>
                 </div>
             </form>
