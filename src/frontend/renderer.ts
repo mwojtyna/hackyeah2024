@@ -32,12 +32,11 @@ import "./root.tsx";
 
 console.log('👋 This message is being logged by "renderer.ts", included via Vite');
 
-(async () => {
-const tmp = (await import(`../../tmp?raw`)).default
-console.log("tehtueh", tmp)
-const res1 = await website_search_summary("find me a contact info", tmp)
-console.log("res1", res1);
-const res2 = await extract_info_json("find me a contact info", res1)
-console.log("res2", res2);
-})()
-
+// (async () => {
+// const tmp = (await import(`../../tmp?raw`)).default
+// console.log("tehtueh", tmp)
+// const res1 = await website_search_summary("find me a contact info", tmp)
+// console.log("res1", res1);
+// const res2 = await extract_info_json("find me a contact info", res1)
+// console.log("res2", res2);
+// })()

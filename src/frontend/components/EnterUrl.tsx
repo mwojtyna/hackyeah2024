@@ -28,7 +28,7 @@ export function EnterUrlScreen({
             <h1 className="mx-auto text-6xl font-bold">Better Web</h1>
             <div className="mx-auto flex gap-4 mt-8">
                 <Input
-                    className="h-16 min-w-64 text-3xl rounded-md p-2 border-2"
+                    className="h-16 min-w-[400px] text-3xl rounded-md p-2 border-2"
                     ref={inputRef}
                     onKeyDown={(e) => {
                         if (e.key == "Enter") {

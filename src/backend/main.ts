@@ -10,7 +10,7 @@ if (require("electron-squirrel-startup")) {
 const WIDTH = 1420;
 const HEIGHT = 800;
 const UI_HORI_SIZE = 500;
-const UI_VERT_SIZE = 300;
+const UI_VERT_SIZE = 500;
 
 const frontendState = new State();
 
@@ -115,10 +115,6 @@ function layoutViews(
             height: UI_VERT_SIZE,
         });
     }
-
-    //embedView.webContents.on("did-finish-load", async () => {
-    //    embedView.webContents.executeJavaScript(`alert()`)
-    //})
 }
 
 // This method will be called when Electron has finished

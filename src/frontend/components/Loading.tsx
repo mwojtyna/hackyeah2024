@@ -9,8 +9,7 @@ export function Loading({
     updateState: React.Dispatch<React.SetStateAction<State>>;
 }) {
     window.api.onUrlLoaded(() => {
-        state.currentView = "chatWithWebPage";
-        updateState({ ...state });
+        updateState({ ...state, currentView: "chatWithWebPage" });
     });
     return (
         <div className="w-screen h-screen flex flex-col justify-center items-center">
