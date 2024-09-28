@@ -6,9 +6,9 @@ export function App() {
     const [state, setState] = useState(new State());
 
     switch (state.currentView) {
-        case 'enterURL':
+        case "enterURL":
             return <EnterUrlScreen state={state} updateState={setState} />;
         default:
-            return 'nosuchfile'
+            return "nosuchfile";
     }
 }

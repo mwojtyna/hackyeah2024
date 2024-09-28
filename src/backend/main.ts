@@ -1,5 +1,4 @@
-import { app, BrowserWindow, WebContentsView } from "electron";
-import { BaseWindow } from "electron/main";
+import { app, BrowserWindow, ipcMain, WebContentsView, BaseWindow } from "electron";
 import path from "path";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -17,12 +16,13 @@ function createWindow() {
     const mainWindow = new BrowserWindow({
         width: WIDTH,
         height: HEIGHT,
+    });
+
+    const uiView = new WebContentsView({
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
         },
     });
-
-    const uiView = new WebContentsView();
     mainWindow.contentView.addChildView(uiView);
     if (landscape(mainWindow, UI_HORI_SIZE)) {
         uiView.setBounds({
@@ -117,7 +117,12 @@ function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on("ready", createWindow);
+app.on("ready", () => {
+    createWindow();
+    ipcMain.on("send-initial-url", (_, a0) => {
+        const title = a0 as string;
+    });
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

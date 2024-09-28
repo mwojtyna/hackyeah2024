@@ -37,6 +37,7 @@ export function EnterUrlScreen({
                             console.error("wrong url");
                         }
                         updateState({ ...state });
+                        window.api.sendInitialUrl(state.webPageURL.toString());
                     }}
                 >
                     ENT
