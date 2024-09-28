@@ -1,4 +1,5 @@
 import { CornerDownLeft, Mic, Paperclip } from "lucide-react";
+import { useCallback, useState } from "react";
 import { State } from "../../types/state";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
@@ -12,6 +13,11 @@ export function Chat({
     state: State;
     updateState: React.Dispatch<React.SetStateAction<State>>;
 }) {
+    const [input, setInput] = useState("");
+    const onSubmitCb = useCallback(() => {
+        console.log(input);
+    }, [input]);
+
     return (
         <div className="flex h-full w-full flex-col p-4 gap-4 justify-between">
             <div>
@@ -28,7 +34,10 @@ export function Chat({
             </div>
 
             <form
-                onSubmit={(e) => e.preventDefault()}
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    onSubmitCb();
+                }}
                 className="mb-7 overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring"
             >
                 <Label htmlFor="message" className="sr-only">
@@ -38,6 +47,14 @@ export function Chat({
                     id="message"
                     placeholder="Type your message here..."
                     className="min-h-12 resize-none border-0 p-3 shadow-none focus-visible:ring-0"
+                    value={input}
+                    onKeyDown={(e) => {
+                        if (e.key == "Enter" && !e.shiftKey) {
+                            e.preventDefault();
+                            onSubmitCb();
+                        }
+                    }}
+                    onChange={(e) => setInput(e.currentTarget.value)}
                 />
                 <div className="flex items-center p-2 pt-0">
                     <Tooltip>
