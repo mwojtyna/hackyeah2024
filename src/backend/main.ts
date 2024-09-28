@@ -52,7 +52,6 @@ function createWindow(): {
 
     const embedView = new WebContentsView();
     mainWindow.contentView.addChildView(embedView);
-    embedView.webContents.loadURL("https://google.pl");
     mainWindow.on("resize", () => {
         switch (frontendState.currentView) {
             case "chatWithWebPage": {
@@ -73,7 +72,7 @@ function createWindow(): {
 
     // Open the DevTools.
     uiView.webContents.openDevTools({ mode: "detach" });
-    // embedView.webContents.openDevTools({ mode: "detach" });
+    //embedView.webContents.openDevTools({ mode: "detach" });
 
     return {
         mainWindow,
@@ -114,6 +113,10 @@ function layoutViews(
             height: UI_VERT_SIZE,
         });
     }
+
+    //embedView.webContents.on("did-finish-load", async () => {
+    //    embedView.webContents.executeJavaScript(`alert()`)
+    //})
 }
 
 // This method will be called when Electron has finished
@@ -130,6 +133,10 @@ app.on("ready", () => {
             width: mainWindow.getSize()[0],
             height: mainWindow.getSize()[1],
         });
+        embedView.webContents.loadURL(url);
+        embedView.webContents.on('did-finish-load', () => {
+            uiView.webContents.send('url-loaded')
+        })
         layoutViews(mainWindow, uiView, embedView);
         frontendState.currentView = "chatWithWebPage";
     });

@@ -15,6 +15,7 @@ export function EnterUrlScreen({
     const submitCb = useCallback(() => {
         try {
             state.webPageURL = new URL(inputRef.current.value);
+            state.currentView = "loading";
         } catch {
             console.error("wrong url");
         }
