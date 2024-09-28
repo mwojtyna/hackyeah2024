@@ -1,11 +1,14 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
+import { Layout } from "@/types/shared";
 import { contextBridge, ipcRenderer } from "electron";
 
 contextBridge.exposeInMainWorld("api", {
     sendInitialUrl: (url: string) => ipcRenderer.send("send-initial-url", url),
     onUrlLoaded: (callback: () => void) => ipcRenderer.on("url-loaded", callback),
+    onLayoutChange: (callback: (layout: Layout) => void) =>
+        ipcRenderer.on("layout-change", (_, layout) => callback(layout)),
 });
 
 // Add type definitions here
@@ -14,6 +17,7 @@ declare global {
         api: {
             sendInitialUrl: (url: string) => void;
             onUrlLoaded: (callback: () => void) => void;
+            onLayoutChange: (callback: (layout: Layout) => void) => void;
         };
     }
 }

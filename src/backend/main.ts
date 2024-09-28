@@ -1,3 +1,4 @@
+import { Layout } from "@/types/shared";
 import { app, BrowserWindow, ipcMain, WebContentsView } from "electron";
 import path from "path";
 import { State } from "../types/state";
@@ -10,9 +11,10 @@ if (require("electron-squirrel-startup")) {
 const WIDTH = 1420;
 const HEIGHT = 800;
 const UI_HORI_SIZE = 500;
-const UI_VERT_SIZE = 500;
+const UI_VERT_SIZE = 400;
 
 const frontendState = new State();
+let layout: Layout = "landscape";
 
 function createWindow(): {
     mainWindow: BrowserWindow;
@@ -101,6 +103,10 @@ function layoutViews(
             width: UI_HORI_SIZE,
             height: mainWindow.getSize()[1],
         });
+        if (layout == "portrait") {
+            layout = "landscape";
+            uiView.webContents.send("layout-change", layout);
+        }
     } else {
         embedView.setBounds({
             x: 0,
@@ -114,6 +120,10 @@ function layoutViews(
             width: mainWindow.getSize()[0],
             height: UI_VERT_SIZE,
         });
+        if (layout == "landscape") {
+            layout = "portrait";
+            uiView.webContents.send("layout-change", layout);
+        }
     }
 }
 
