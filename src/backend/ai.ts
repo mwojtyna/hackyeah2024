@@ -5,85 +5,56 @@ const CONFIG = {
     model: "llama3.2",
 };
 
-export async function evaluate_urls(prompt: string, urls: string[]): Promise<string[]> {
-    try {
-        const evaluate_urls_prompt = (await import(`./prompts/url_evaluation.md?raw`)).default;
-        const response = await ollama.chat({
-            ...CONFIG,
-            format: "json",
-            messages: [
-                {
-                    role: "system",
-                    content: evaluate_urls_prompt,
-                },
-                {
-                    role: "user",
-                    content: JSON.stringify({
-                        prompt,
-                        urls,
-                    }),
-                },
-            ]
-        })
+async function ask(recipe: string, prompt: string, json = false) {
+    return (await ollama.chat({
+        ...CONFIG,
+        format: json ? "json" : "text",
+        messages: [
+            {
+                role: "system",
+                content: recipe,
+            },
+            {
+                role: "user",
+                content: prompt,
+            },
+        ]
+    })).message.content
+}
 
-        return JSON.parse(response.message.content).urls;
-    } catch (e) {
-        console.log("error", e);
-        return [];
-    }
+export async function evaluate_urls(prompt: string, urls: string[]): Promise<string[]> {
+    const recipe = (await import(`./prompts/url_evaluation.md?raw`)).default;
+
+    const response = await ask(recipe, JSON.stringify({
+        prompt,
+        urls,
+    }), true);
+
+    return JSON.parse(response).urls;
+}
+
+export async function improve_user_request(request: string): Promise<string> {
+    const recipe = (await import(`./prompts/improve_user_request.md?raw`)).default
+
+    return await ask(recipe, request)
 }
 
 export async function website_search_summary(prompt: string, website: string): Promise<string> {
-    try {
-        const recipe = (await import(`./prompts/website_search_summary.md?raw`)).default
-        const response = await ollama.chat({
-            ...CONFIG,
-            messages: [
-                {
-                    role: 'system',
-                    content: recipe
-                },
-                {
-                    role: 'user',
-                    content: JSON.stringify({
-                        prompt,
-                        website
-                    })
-                }
-            ]
-        })
+    const recipe = (await import(`./prompts/website_search_summary.md?raw`)).default
 
-        return response.message.content
-    } catch  (e){
-        console.log('error', e)
-        return ""
-    }
+    return await ask(recipe, JSON.stringify({
+        prompt,
+        website
+    }))
 }
-export async function extract_info_json(prompt: string, text: string): Promise<string[]> {
-    try {
-        const recipe = (await import(`./prompts/extract_info_json.md?raw`)).default
-        console.log('recipe', recipe)
-        const response = await ollama.chat({
-            ...CONFIG,
-            format: "json",
-            messages: [
-                {
-                    role: 'system',
-                    content: recipe
-                },
-                {
-                    role: 'user',
-                    content: JSON.stringify({
-                        prompt,
-                        text
-                    })
-                }
-            ]
-        })
 
-        return JSON.parse(response.message.content).results
-    } catch  (e){
-        console.log('error', e)
-        return []
-    }
+export async function extract_info_json(prompt: string, text: string): Promise<string[]> {
+    const recipe = (await import(`./prompts/extract_info_json.md?raw`)).default
+
+    const response = await ask(recipe, JSON.stringify({
+        prompt,
+        text
+    }), true);
+
+    return JSON.parse(response).results
 }
