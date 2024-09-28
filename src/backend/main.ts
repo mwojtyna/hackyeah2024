@@ -1,5 +1,6 @@
-import { app, BrowserWindow, ipcMain, WebContentsView, BaseWindow } from "electron";
+import { app, BrowserWindow, ipcMain, WebContentsView } from "electron";
 import path from "path";
+import { State } from "../types/state";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
@@ -11,7 +12,13 @@ const HEIGHT = 800;
 const UI_HORI_SIZE = 500;
 const UI_VERT_SIZE = 300;
 
-function createWindow() {
+const frontendState = new State();
+
+function createWindow(): {
+    mainWindow: BrowserWindow;
+    uiView: WebContentsView;
+    embedView: WebContentsView;
+} {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
         width: WIDTH,
@@ -24,37 +31,11 @@ function createWindow() {
         },
     });
     mainWindow.contentView.addChildView(uiView);
-    if (landscape(mainWindow, UI_HORI_SIZE)) {
-        uiView.setBounds({
-            x: 0,
-            y: 0,
-            width: UI_HORI_SIZE,
-            height: mainWindow.getSize()[1],
-        });
-    } else {
-        uiView.setBounds({
-            x: 0,
-            y: mainWindow.getSize()[1] - UI_VERT_SIZE,
-            width: mainWindow.getSize()[0],
-            height: UI_VERT_SIZE,
-        });
-    }
-    mainWindow.on("resize", () => {
-        if (landscape(mainWindow, UI_HORI_SIZE)) {
-            uiView.setBounds({
-                x: 0,
-                y: 0,
-                width: UI_HORI_SIZE,
-                height: mainWindow.getSize()[1],
-            });
-        } else {
-            uiView.setBounds({
-                x: 0,
-                y: mainWindow.getSize()[1] - UI_VERT_SIZE,
-                width: mainWindow.getSize()[0],
-                height: UI_VERT_SIZE,
-            });
-        }
+    uiView.setBounds({
+        x: 0,
+        y: 0,
+        width: mainWindow.getSize()[0],
+        height: mainWindow.getSize()[1],
     });
 
     // and load the index.html of the app.
@@ -72,11 +53,51 @@ function createWindow() {
     const embedView = new WebContentsView();
     mainWindow.contentView.addChildView(embedView);
     embedView.webContents.loadURL("https://google.pl");
-    if (landscape(mainWindow, UI_HORI_SIZE)) {
+    mainWindow.on("resize", () => {
+        switch (frontendState.currentView) {
+            case "chatWithWebPage": {
+                layoutViews(mainWindow, uiView, embedView);
+                break;
+            }
+            case "enterURL": {
+                uiView.setBounds({
+                    x: 0,
+                    y: 0,
+                    width: mainWindow.getSize()[0],
+                    height: mainWindow.getSize()[1],
+                });
+                break;
+            }
+        }
+    });
+
+    // Open the DevTools.
+    uiView.webContents.openDevTools({ mode: "detach" });
+    // embedView.webContents.openDevTools({ mode: "detach" });
+
+    return {
+        mainWindow,
+        uiView,
+        embedView,
+    };
+}
+
+function layoutViews(
+    mainWindow: BrowserWindow,
+    uiView: WebContentsView,
+    embedView: WebContentsView,
+) {
+    if (UI_HORI_SIZE < mainWindow.getSize()[0] / 2) {
         embedView.setBounds({
             x: UI_HORI_SIZE,
             y: 0,
             width: mainWindow.getSize()[0] - UI_HORI_SIZE,
+            height: mainWindow.getSize()[1],
+        });
+        uiView.setBounds({
+            x: 0,
+            y: 0,
+            width: UI_HORI_SIZE,
             height: mainWindow.getSize()[1],
         });
     } else {
@@ -86,31 +107,12 @@ function createWindow() {
             width: mainWindow.getSize()[0],
             height: mainWindow.getSize()[1] - UI_VERT_SIZE,
         });
-    }
-    mainWindow.on("resize", () => {
-        if (landscape(mainWindow, UI_HORI_SIZE)) {
-            embedView.setBounds({
-                x: UI_HORI_SIZE,
-                y: 0,
-                width: mainWindow.getSize()[0] - UI_HORI_SIZE,
-                height: mainWindow.getSize()[1],
-            });
-        } else {
-            embedView.setBounds({
-                x: 0,
-                y: 0,
-                width: mainWindow.getSize()[0],
-                height: mainWindow.getSize()[1] - UI_VERT_SIZE,
-            });
-        }
-    });
-
-    // Open the DevTools.
-    uiView.webContents.openDevTools({ mode: "detach" });
-    // embedView.webContents.openDevTools({ mode: "detach" });
-
-    function landscape(window: BaseWindow, uiSize: number): boolean {
-        return uiSize < window.getSize()[0] / 2;
+        uiView.setBounds({
+            x: 0,
+            y: mainWindow.getSize()[1] - UI_VERT_SIZE,
+            width: mainWindow.getSize()[0],
+            height: UI_VERT_SIZE,
+        });
     }
 }
 
@@ -118,9 +120,18 @@ function createWindow() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on("ready", () => {
-    createWindow();
+    const { mainWindow, uiView, embedView } = createWindow();
     ipcMain.on("send-initial-url", (_, a0) => {
-        const title = a0 as string;
+        const url = a0 as string;
+        uiView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
+        embedView.setBounds({
+            x: 0,
+            y: 0,
+            width: mainWindow.getSize()[0],
+            height: mainWindow.getSize()[1],
+        });
+        layoutViews(mainWindow, uiView, embedView);
+        frontendState.currentView = "chatWithWebPage";
     });
 });
 

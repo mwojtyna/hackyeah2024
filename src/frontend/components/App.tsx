@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { EnterUrlScreen } from "./EnterUrl";
-import { State } from "../../types/State";
+import { State } from "../../types/state";
 
 export function App() {
     const [state, setState] = useState(new State());
@@ -9,6 +9,6 @@ export function App() {
         case "enterURL":
             return <EnterUrlScreen state={state} updateState={setState} />;
         default:
-            return "nosuchfile";
+            return null;
     }
 }
