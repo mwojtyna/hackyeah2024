@@ -25,10 +25,10 @@ export function EnterUrlScreen({
 
     return (
         <div className="w-screen h-screen flex flex-col justify-center items-center">
-            <h1 className="mx-auto text-6xl font-bold">Better Web</h1>
+            <h1 className="mx-auto text-5xl font-bold">Better Web</h1>
             <div className="mx-auto flex gap-4 mt-8">
                 <Input
-                    className="h-16 min-w-[400px] text-3xl rounded-md p-2 border-2"
+                    className="h-12 min-w-[400px] text-xl rounded-md p-2 border-2"
                     ref={inputRef}
                     onKeyDown={(e) => {
                         if (e.key == "Enter") {
@@ -37,7 +37,7 @@ export function EnterUrlScreen({
                     }}
                     placeholder="https://google.com"
                 />
-                <Button className="h-16 w-16" onClick={submitCb}>
+                <Button className="size-12 p-3" onClick={submitCb}>
                     <Search size={32} />
                 </Button>
             </div>
