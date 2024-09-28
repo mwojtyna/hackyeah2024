@@ -1,4 +1,6 @@
 const fs = require("fs");
+const os = require("node:os");
+const path = require("path");
 const { WaveFile } = require("wavefile");
 const { PvRecorder } = require("@picovoice/pvrecorder-node");
 
@@ -28,9 +30,9 @@ async function record() {
 		audiodata.set(frames[i], i * recorder.frameLength);
 	}
 	wav.fromScratch(1, recorder.sampleRate, '16', audiodata);
-	fs.writeFileSync(`recordedAudio.wav`, wav.toBuffer());
+	var filename = path.join(os.tmpdir(), `recordedAudio.wav`);
+	fs.writeFileSync(filename, wav.toBuffer());
 	recorder.stop()
-	//console.log("stopped recording");
 	recorder.release();
 }
 
