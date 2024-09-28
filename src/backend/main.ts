@@ -37,8 +37,8 @@ function createWindow(): {
     uiView.setBounds({
         x: 0,
         y: 0,
-        width: mainWindow.getSize()[0],
-        height: mainWindow.getSize()[1],
+        width: mainWindow.getContentSize()[0],
+        height: mainWindow.getContentSize()[1],
     });
 
     // and load the index.html of the app.
@@ -65,8 +65,8 @@ function createWindow(): {
                 uiView.setBounds({
                     x: 0,
                     y: 0,
-                    width: mainWindow.getSize()[0],
-                    height: mainWindow.getSize()[1],
+                    width: mainWindow.getContentSize()[0],
+                    height: mainWindow.getContentSize()[1],
                 });
                 break;
             }
@@ -91,18 +91,18 @@ function layoutViews(
     uiView: WebContentsView,
     embedView: WebContentsView,
 ) {
-    if (UI_HORI_SIZE < mainWindow.getSize()[0] / 2) {
+    if (UI_HORI_SIZE < mainWindow.getContentSize()[0] / 2) {
         embedView.setBounds({
             x: UI_HORI_SIZE,
             y: 0,
-            width: mainWindow.getSize()[0] - UI_HORI_SIZE,
-            height: mainWindow.getSize()[1],
+            width: mainWindow.getContentSize()[0] - UI_HORI_SIZE,
+            height: mainWindow.getContentSize()[1],
         });
         uiView.setBounds({
             x: 0,
             y: 0,
             width: UI_HORI_SIZE,
-            height: mainWindow.getSize()[1],
+            height: mainWindow.getContentSize()[1],
         });
         if (layout == "portrait") {
             layout = "landscape";
@@ -112,13 +112,13 @@ function layoutViews(
         embedView.setBounds({
             x: 0,
             y: 0,
-            width: mainWindow.getSize()[0],
-            height: mainWindow.getSize()[1] - UI_VERT_SIZE,
+            width: mainWindow.getContentSize()[0],
+            height: mainWindow.getContentSize()[1] - UI_VERT_SIZE,
         });
         uiView.setBounds({
             x: 0,
-            y: mainWindow.getSize()[1] - UI_VERT_SIZE,
-            width: mainWindow.getSize()[0],
+            y: mainWindow.getContentSize()[1] - UI_VERT_SIZE,
+            width: mainWindow.getContentSize()[0],
             height: UI_VERT_SIZE,
         });
         if (layout == "landscape") {
@@ -138,8 +138,8 @@ app.on("ready", () => {
         embedView.setBounds({
             x: 0,
             y: 0,
-            width: mainWindow.getSize()[0],
-            height: mainWindow.getSize()[1],
+            width: mainWindow.getContentSize()[0],
+            height: mainWindow.getContentSize()[1],
         });
         embedView.webContents.loadURL(url);
         embedView.webContents.on("dom-ready", async () => {
