@@ -39,10 +39,12 @@
     },
     "license": "MIT",
     "dependencies": {
+        "@picovoice/pvrecorder-node": "^1.2.4",
         "electron-squirrel-startup": "^1.0.1",
-        "ollama": "^0.5.9",
         "llamaai": "^1.0.4",
+        "ollama": "^0.5.9",
         "react": "^18.3.1",
-        "react-dom": "^18.3.1"
+        "react-dom": "^18.3.1",
+        "wavefile": "^11.0.0"
     }
 }
