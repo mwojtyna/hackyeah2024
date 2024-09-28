@@ -34,8 +34,20 @@ function createWindow() {
     const embedView = new WebContentsView();
     mainWindow.contentView.addChildView(embedView);
     embedView.webContents.loadURL("https://google.pl");
-    embedView.setBounds({ x: 0, y: 0, width: WIDTH, height: HEIGHT });
-    // embedView.webContents.on("context-menu", (e) => {});
+    embedView.setBounds({
+        x: 0,
+        y: 0,
+        width: mainWindow.getSize()[0],
+        height: mainWindow.getSize()[1],
+    });
+    mainWindow.on("resize", () =>
+        embedView.setBounds({
+            x: 0,
+            y: 0,
+            width: mainWindow.getSize()[0],
+            height: mainWindow.getSize()[1],
+        }),
+    );
 
     // Open the DevTools.
     // mainWindow.webContents.openDevTools();
