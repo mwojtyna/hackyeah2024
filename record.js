@@ -2,23 +2,23 @@ const fs = require("fs");
 const { WaveFile } = require("wavefile");
 const { PvRecorder } = require("@picovoice/pvrecorder-node");
 
+const Mutex = require('async-mutex').Mutex;
 const { program } = require("commander");
 
 const sleep = delay => new Promise(resolve => setTimeout(resolve, delay));
 
-// this needs to be done not by changing a global variable
-let stopAudioRecording = false;
-
+var recording_mutex = new Mutex();
 
 async function record() {
 	const frames = [];
 	const framelength = 512;
 	//console.log(PvRecorder.getAvailableDevices());
 	const wav = new WaveFile();
+	console.log()
 	const recorder = new PvRecorder(framelength, -1);
 	recorder.start()
 
-	while(!stopAudioRecording) {
+	while(recording_mutex.isLocked()) {
 		const frame = await recorder.read();
 		frames.push(frame);
 	}
@@ -36,10 +36,10 @@ async function record() {
 
 (async function () {
 	try {
+		recording_mutex.acquire();
 		record();
-		await sleep(5000);
-		stopAudioRecording=true;
-		// change this to some mutex thing
+		await sleep(5000); // replace with user action
+		recording_mutex.release();
 	}
 	catch {}
 })();
