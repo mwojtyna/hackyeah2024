@@ -14,7 +14,6 @@ where `keywords` is an array of extracted text fragments.
 important keywords from the relevant section of the text and return them in a JSON array.
 
 ### Example Input
-```markdown
 user is gonna provide you with a request
 from the text in the `text`, extract the most important keywords
 return the keywords in json array, like
@@ -22,7 +21,7 @@ return the keywords in json array, like
 {
     "results": []
 }
-```
+
 ### Context
 The task requires you to analyze user input, understand their intent, and retrieve relevant information from a text. The output should be a JSON array of extracted keywords, which
 can be used for further processing or analysis.
