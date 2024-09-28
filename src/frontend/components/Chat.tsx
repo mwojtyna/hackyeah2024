@@ -9,10 +9,41 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { cn } from "../utils";
 import { Layout } from "@/types/shared";
 
-type ChatBubble = {
-    message: string;
+type ChatMessage = {
+    message: React.ReactNode;
     sender: "user" | "ai";
 };
+
+function ChatBubble({ message, sender }: ChatMessage) {
+    return (
+        <div
+            className={cn(
+                "px-4 py-2 text-white rounded-lg whitespace-pre-line",
+                sender === "user" ? "bg-gray-600" : "bg-stone-900",
+                sender === "user" ? "ml-auto" : "mr-auto",
+            )}
+        >
+            <p>{message}</p>
+        </div>
+    );
+}
+
+function DotsLoading() {
+    return (
+        <div>
+            {Array(3)
+                .fill(undefined)
+                .map((_, i) => (
+                    <span
+                        className="inline-block animate-bounce h-3"
+                        style={{ animationDelay: `${i * 50}ms` }}
+                    >
+                        .
+                    </span>
+                ))}
+        </div>
+    );
+}
 
 export function Chat({
     state,
@@ -28,7 +59,7 @@ export function Chat({
     }, []);
 
     const [input, setInput] = useState("");
-    const [bubbles, setBubbles] = useState<ChatBubble[]>([]);
+    const [bubbles, setBubbles] = useState<ChatMessage[]>([]);
     const mutation = useMutation({
         mutationFn: async (msg: string) => {
             setInput("");
@@ -49,29 +80,10 @@ export function Chat({
         >
             <div className="flex flex-col max-h-[80%] gap-4 overflow-auto">
                 {bubbles.map((bubble, i) => (
-                    <div
-                        key={i}
-                        className={cn(
-                            "px-4 py-2 text-white rounded-lg whitespace-pre-line",
-                            bubble.sender === "user" ? "bg-gray-600" : "bg-stone-900",
-                            bubble.sender === "user" ? "ml-auto" : "mr-auto",
-                        )}
-                    >
-                        <p>{bubble.message}</p>
-                    </div>
+                    <ChatBubble key={i} message={bubble.message} sender={bubble.sender} />
                 ))}
 
-                {mutation.isPending && (
-                    <div
-                        className={cn(
-                            "px-4 py-2 text-white rounded-lg whitespace-pre-line",
-                            "bg-stone-900",
-                            "mr-auto",
-                        )}
-                    >
-                        <p>...</p>
-                    </div>
-                )}
+                {mutation.isPending && <ChatBubble message={<DotsLoading />} sender={"ai"} />}
             </div>
 
             <form
@@ -118,11 +130,7 @@ export function Chat({
                         disabled={mutation.isPending}
                     >
                         Send Message
-                        {mutation.isPending ? (
-                            <LoaderCircle className="animate-spin size-3.5" />
-                        ) : (
-                            <CornerDownLeft className="size-3.5" />
-                        )}
+                        <CornerDownLeft className="size-3.5" />
                     </Button>
                 </div>
             </form>
