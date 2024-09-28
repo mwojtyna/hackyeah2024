@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { EnterUrlScreen } from "./EnterUrl";
-import { State } from "../../types/state";
+import { State } from "@/types/state";
 
 export function App() {
     const [state, setState] = useState(new State());

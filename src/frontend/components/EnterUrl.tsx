@@ -1,5 +1,8 @@
+import { Search } from "lucide-react";
 import React, { useCallback, useRef } from "react";
 import { State } from "../../types/state";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 
 export function EnterUrlScreen({
     state,
@@ -23,8 +26,8 @@ export function EnterUrlScreen({
         <div className="w-screen h-screen flex flex-col justify-center items-center">
             <h1 className="mx-auto text-6xl font-bold">Better Web</h1>
             <div className="mx-auto flex gap-4 mt-8">
-                <input
-                    className="h-16 min-w-64 text-4xl rounded-md p-2 border-black border-2"
+                <Input
+                    className="h-16 min-w-64 text-3xl rounded-md p-2 border-2"
                     ref={inputRef}
                     onKeyDown={(e) => {
                         if (e.key == "Enter") {
@@ -33,9 +36,9 @@ export function EnterUrlScreen({
                     }}
                     placeholder="https://google.com"
                 />
-                <button className="h-16 w-16 rounded-md border-black border-2" onClick={submitCb}>
-                    ENT
-                </button>
+                <Button className="h-16 w-16" onClick={submitCb}>
+                    <Search size={32} />
+                </Button>
             </div>
         </div>
     );

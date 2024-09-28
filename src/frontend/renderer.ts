@@ -26,38 +26,36 @@
  * ```
  */
 
-import { evaluate_urls } from "../../src/backend/ai";
-import "./index.css";
+import "./globals.css";
 import "./root.tsx";
 
 console.log('👋 This message is being logged by "renderer.ts", included via Vite');
 
-
 evaluate_urls("test", [
-        "https://hackyeah.pl/",
-        "https://hackyeah.pl/faq/",
-        "https://hackyeah.pl/tasks-prizes/",
-        "https://hackyeah.pl/justctf/",
-        "https://hackyeah.pl/she-hacks/",
-        "https://hackyeah.pl/conference-2024/",
-        "https://hackyeah.pl/job-board/",
-        "https://hackyeah.pl/media-kit/",
-        "https://hackyeah.pl/wp-content/uploads/2024/02/HackYeah-2024-Rules-ENPL.pdf",
-        "https://hackyeah.pl/wp-content/uploads/2024/02/HackYeah-2024-Privacy-Policy-ENPL.pdf",
-        "https://hackyeah.pl/pl/",
-        "https://hackyeah.pl/bio_mentor_2024/",
-        "https://hackyeah.pl/mentors-2024/",
-        "https://hackyeah.pl/pl/faq/",
-        "https://hackyeah.pl/become-a-mentor/",
-        "https://hackyeah.pl/become-a-speaker/",
-        "https://hackyeah.pl/pl/zadania-nagrody/",
-        "https://hackyeah.pl/pl/justctf/",
-        "https://hackyeah.pl/pl/she-hacks/",
-        "https://hackyeah.pl/pl/konferencja-2024/",
-        "https://hackyeah.pl/pl/job-board/",
-        "https://hackyeah.pl/pl/media-kit/",
-        "https://hackyeah.pl/pl/become-a-mentor/",
-        "https://hackyeah.pl/pl/zostan-prelegentem/"
+    "https://hackyeah.pl/",
+    "https://hackyeah.pl/faq/",
+    "https://hackyeah.pl/tasks-prizes/",
+    "https://hackyeah.pl/justctf/",
+    "https://hackyeah.pl/she-hacks/",
+    "https://hackyeah.pl/conference-2024/",
+    "https://hackyeah.pl/job-board/",
+    "https://hackyeah.pl/media-kit/",
+    "https://hackyeah.pl/wp-content/uploads/2024/02/HackYeah-2024-Rules-ENPL.pdf",
+    "https://hackyeah.pl/wp-content/uploads/2024/02/HackYeah-2024-Privacy-Policy-ENPL.pdf",
+    "https://hackyeah.pl/pl/",
+    "https://hackyeah.pl/bio_mentor_2024/",
+    "https://hackyeah.pl/mentors-2024/",
+    "https://hackyeah.pl/pl/faq/",
+    "https://hackyeah.pl/become-a-mentor/",
+    "https://hackyeah.pl/become-a-speaker/",
+    "https://hackyeah.pl/pl/zadania-nagrody/",
+    "https://hackyeah.pl/pl/justctf/",
+    "https://hackyeah.pl/pl/she-hacks/",
+    "https://hackyeah.pl/pl/konferencja-2024/",
+    "https://hackyeah.pl/pl/job-board/",
+    "https://hackyeah.pl/pl/media-kit/",
+    "https://hackyeah.pl/pl/become-a-mentor/",
+    "https://hackyeah.pl/pl/zostan-prelegentem/",
 ]).then((urls) => {
     console.log("urls", urls);
 });
