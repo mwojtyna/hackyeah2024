@@ -9,6 +9,7 @@ if (require("electron-squirrel-startup")) {
 function createWindow() {
     const WIDTH = 800;
     const HEIGHT = 800;
+    const UI_HEIGHT = 300;
 
     // Create the browser window.
     const mainWindow = new BrowserWindow({
@@ -19,11 +20,28 @@ function createWindow() {
         },
     });
 
+    const uiView = new WebContentsView();
+    mainWindow.contentView.addChildView(uiView);
+    uiView.setBounds({
+        x: 0,
+        y: mainWindow.getSize()[1] - UI_HEIGHT,
+        width: mainWindow.getSize()[0],
+        height: UI_HEIGHT,
+    });
+    mainWindow.on("resize", () =>
+        uiView.setBounds({
+            x: 0,
+            y: mainWindow.getSize()[1] - UI_HEIGHT,
+            width: mainWindow.getSize()[0],
+            height: UI_HEIGHT,
+        }),
+    );
+
     // and load the index.html of the app.
     // @ts-expect-error missing types for env
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
         // @ts-expect-error missing types for env
-        mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+        uiView.webContents.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
     } else {
         mainWindow.loadFile(
             // @ts-expect-error missing types for env
@@ -38,14 +56,14 @@ function createWindow() {
         x: 0,
         y: 0,
         width: mainWindow.getSize()[0],
-        height: mainWindow.getSize()[1],
+        height: mainWindow.getSize()[1] - UI_HEIGHT,
     });
     mainWindow.on("resize", () =>
         embedView.setBounds({
             x: 0,
             y: 0,
             width: mainWindow.getSize()[0],
-            height: mainWindow.getSize()[1],
+            height: mainWindow.getSize()[1] - UI_HEIGHT,
         }),
     );
 
