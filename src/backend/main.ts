@@ -1,29 +1,48 @@
-import { app, BrowserWindow, WebContentsView } from "electron";
+import { app, BrowserWindow, ipcMain, WebContentsView } from "electron";
 import path from "path";
+import { State } from "../types/state";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require("electron-squirrel-startup")) {
     app.quit();
 }
 
-function createWindow() {
-    const WIDTH = 800;
-    const HEIGHT = 800;
+const WIDTH = 1420;
+const HEIGHT = 800;
+const UI_HORI_SIZE = 500;
+const UI_VERT_SIZE = 300;
 
+const frontendState = new State();
+
+function createWindow(): {
+    mainWindow: BrowserWindow;
+    uiView: WebContentsView;
+    embedView: WebContentsView;
+} {
     // Create the browser window.
     const mainWindow = new BrowserWindow({
         width: WIDTH,
         height: HEIGHT,
+    });
+
+    const uiView = new WebContentsView({
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
         },
+    });
+    mainWindow.contentView.addChildView(uiView);
+    uiView.setBounds({
+        x: 0,
+        y: 0,
+        width: mainWindow.getSize()[0],
+        height: mainWindow.getSize()[1],
     });
 
     // and load the index.html of the app.
     // @ts-expect-error missing types for env
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
         // @ts-expect-error missing types for env
-        mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+        uiView.webContents.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
     } else {
         mainWindow.loadFile(
             // @ts-expect-error missing types for env
@@ -34,37 +53,93 @@ function createWindow() {
     const embedView = new WebContentsView();
     mainWindow.contentView.addChildView(embedView);
     embedView.webContents.loadURL("https://google.pl");
-    embedView.setBounds({
-        x: 0,
-        y: 0,
-        width: mainWindow.getSize()[0],
-        height: mainWindow.getSize()[1],
+    mainWindow.on("resize", () => {
+        switch (frontendState.currentView) {
+            case "chatWithWebPage": {
+                layoutViews(mainWindow, uiView, embedView);
+                break;
+            }
+            case "enterURL": {
+                uiView.setBounds({
+                    x: 0,
+                    y: 0,
+                    width: mainWindow.getSize()[0],
+                    height: mainWindow.getSize()[1],
+                });
+                break;
+            }
+        }
     });
-    mainWindow.on("resize", () =>
+
+    // Open the DevTools.
+    uiView.webContents.openDevTools({ mode: "detach" });
+    // embedView.webContents.openDevTools({ mode: "detach" });
+
+    return {
+        mainWindow,
+        uiView,
+        embedView,
+    };
+}
+
+function layoutViews(
+    mainWindow: BrowserWindow,
+    uiView: WebContentsView,
+    embedView: WebContentsView,
+) {
+    if (UI_HORI_SIZE < mainWindow.getSize()[0] / 2) {
+        embedView.setBounds({
+            x: UI_HORI_SIZE,
+            y: 0,
+            width: mainWindow.getSize()[0] - UI_HORI_SIZE,
+            height: mainWindow.getSize()[1],
+        });
+        uiView.setBounds({
+            x: 0,
+            y: 0,
+            width: UI_HORI_SIZE,
+            height: mainWindow.getSize()[1],
+        });
+    } else {
         embedView.setBounds({
             x: 0,
             y: 0,
             width: mainWindow.getSize()[0],
-            height: mainWindow.getSize()[1],
-        }),
-    );
-
-    // Open the DevTools.
-    // mainWindow.webContents.openDevTools();
+            height: mainWindow.getSize()[1] - UI_VERT_SIZE,
+        });
+        uiView.setBounds({
+            x: 0,
+            y: mainWindow.getSize()[1] - UI_VERT_SIZE,
+            width: mainWindow.getSize()[0],
+            height: UI_VERT_SIZE,
+        });
+    }
 }
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on("ready", createWindow);
+app.on("ready", () => {
+    const { mainWindow, uiView, embedView } = createWindow();
+    ipcMain.on("send-initial-url", (_, a0) => {
+        const url = a0 as string;
+        uiView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
+        embedView.setBounds({
+            x: 0,
+            y: 0,
+            width: mainWindow.getSize()[0],
+            height: mainWindow.getSize()[1],
+        });
+        layoutViews(mainWindow, uiView, embedView);
+        frontendState.currentView = "chatWithWebPage";
+    });
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
-    if (process.platform !== "darwin") {
-        app.quit();
-    }
+    app.quit();
 });
 
 app.on("activate", () => {
