@@ -3,6 +3,7 @@ const { WaveFile } = require("wavefile");
 const { PvRecorder } = require("@picovoice/pvrecorder-node");
 
 let stop = false;
+const sleep = delay => new Promise(resolve => setTimeout(resolve, delay))
 
 async function record() {
 	let outputpath = "audio.wav";
@@ -11,7 +12,7 @@ async function record() {
 	const frames = [];
 	const framelength = 512;
 
-	const recorder = new PvRecorder(framelength, -1);
+	const recorder = new PvRecorder(framelength, 1);
 
 	while(!stop) {
 		const frame = await recorder.read();
@@ -28,4 +29,9 @@ async function record() {
 	recorder.release();
 }
 
+record();
+
+sleep(5000);
+
+stop=true;
 
