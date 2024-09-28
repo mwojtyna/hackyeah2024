@@ -1,6 +1,7 @@
+import { useMutation } from "@tanstack/react-query";
 import { CornerDownLeft, Mic, Paperclip } from "lucide-react";
-import { useCallback, useState } from "react";
-import { State } from "../../types/state";
+import { useState } from "react";
+import { State } from "@/types/state";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
@@ -14,9 +15,15 @@ export function Chat({
     updateState: React.Dispatch<React.SetStateAction<State>>;
 }) {
     const [input, setInput] = useState("");
-    const onSubmitCb = useCallback(() => {
-        console.log(input);
-    }, [input]);
+    const mutation = useMutation({
+        mutationFn: (msg: string) =>
+            new Promise(() => {
+                console.log("mutation");
+            }),
+        onMutate: () => {
+            console.log("onmutation");
+        },
+    });
 
     return (
         <div className="flex h-full w-full flex-col p-4 gap-4 justify-between">
@@ -36,7 +43,7 @@ export function Chat({
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
-                    onSubmitCb();
+                    mutation.mutate(input);
                 }}
                 className="mb-7 overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring"
             >
@@ -51,7 +58,7 @@ export function Chat({
                     onKeyDown={(e) => {
                         if (e.key == "Enter" && !e.shiftKey) {
                             e.preventDefault();
-                            onSubmitCb();
+                            mutation.mutate(input);
                         }
                     }}
                     onChange={(e) => setInput(e.currentTarget.value)}
