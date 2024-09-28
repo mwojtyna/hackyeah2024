@@ -1,18 +1,15 @@
-const http = require('http');
 const https = require('https');
 
 // fetch given url content using HTTP GET
-const fetchHost = (url) => {
+const fetchHost = (_hostname, _path) => {
     return new Promise((resolve, reject) => {
-        protocol = url.substr(0, 5);
-        let client;
-        if (protocol == 'http:')
-            client = http;
-        else if (protocol == 'https')
-            client = https;
-        else throw new Error(`unrecognized protocol: ${protocol}`);
+        var options = {
+            hostname: _hostname,
+            path: _path,
+            headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:10.0) Gecko/20100101 Firefox/10.0' }
+        };
         let data = ''
-        var request = client.get(url, (res) => {
+        var request = https.get(options, (res) => {
             res.on('data', (chunk) => {
                 data += chunk;
             });
@@ -28,7 +25,7 @@ const fetchHost = (url) => {
 
 // get all the embeeded links from given html data ('<!DOCTYPE html><html>...</html>')
 const getLinks = (htmlData) => {
-    var pattern=/href=('|")([^('|")]+)('|")/g;
+    var pattern = /href=('|")([^('|")]+)('|")/g;
     let link, links = [];
     while (link = pattern.exec(htmlData)) {
         links.push(link[0].substring(6, link[0].length - 1));
@@ -45,3 +42,5 @@ const fetchMetadata = async(data) => {
     }
     return meta_tags;
 }
+
+module.exports = { fetchHost, getLinks, fetchMetadata };

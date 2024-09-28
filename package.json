@@ -49,6 +49,7 @@
         "electron-squirrel-startup": "^1.0.1",
         "http": "^0.0.1-security",
         "https": "^1.0.0",
+        "jsdom": "^25.0.1",
         "llamaai": "^1.0.4",
         "lucide-react": "^0.446.0",
         "ollama": "^0.5.9",
