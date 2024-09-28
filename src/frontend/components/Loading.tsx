@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { State } from "../../types/state";
+import { State } from "@/types/state";
+import { LoaderCircle } from "lucide-react";
 
 export function Loading({
     state,
@@ -9,13 +9,13 @@ export function Loading({
     updateState: React.Dispatch<React.SetStateAction<State>>;
 }) {
     window.api.onUrlLoaded(() => {
-        state.currentView = "chatWithWebPage"
-        updateState({ ...state })
-    })
+        state.currentView = "chatWithWebPage";
+        updateState({ ...state });
+    });
     return (
         <div className="w-screen h-screen flex flex-col justify-center items-center">
             <div className="m-auto">
-                loading...
+                <LoaderCircle className="animate-spin" size={48} />
             </div>
         </div>
     );

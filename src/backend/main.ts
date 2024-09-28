@@ -134,9 +134,9 @@ app.on("ready", () => {
             height: mainWindow.getSize()[1],
         });
         embedView.webContents.loadURL(url);
-        embedView.webContents.on('did-finish-load', () => {
-            uiView.webContents.send('url-loaded')
-        })
+        embedView.webContents.on("dom-ready", () => {
+            uiView.webContents.send("url-loaded");
+        });
         layoutViews(mainWindow, uiView, embedView);
         frontendState.currentView = "chatWithWebPage";
     });
