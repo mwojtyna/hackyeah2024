@@ -35,6 +35,7 @@ function createWindow() {
     mainWindow.contentView.addChildView(embedView);
     embedView.webContents.loadURL("https://google.pl");
     embedView.setBounds({ x: 0, y: 0, width: WIDTH, height: HEIGHT });
+    // embedView.webContents.on("context-menu", (e) => {});
 
     // Open the DevTools.
     // mainWindow.webContents.openDevTools();
