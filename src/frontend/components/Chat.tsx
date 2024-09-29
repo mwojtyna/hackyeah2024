@@ -17,6 +17,13 @@ type ChatMessage = {
 function ChatBubble({ message, sender }: ChatMessage) {
     return (
         <div
+            onMouseUp={() => {
+                if (sender != "ai") return
+
+                console.log('asdf')
+                const selection = window.getSelection().toString()
+                window.api.selectText(selection)
+            }}
             className={cn(
                 "px-4 py-2 text-white rounded-lg whitespace-pre-line",
                 sender === "user" ? "bg-gray-600" : "bg-stone-900",
@@ -55,7 +62,7 @@ export function Chat({
     const [layout, setLayout] = useState<Layout>("landscape");
     useEffect(() => {
         window.api.onLayoutChange((newLayout) => setLayout(newLayout));
-        return () => window.api.onLayoutChange(() => {});
+        return () => window.api.onLayoutChange(() => { });
     }, []);
 
     const [input, setInput] = useState("");

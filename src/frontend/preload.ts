@@ -10,6 +10,7 @@ contextBridge.exposeInMainWorld("api", {
     onLayoutChange: (callback: (layout: Layout) => void) =>
         ipcRenderer.on("layout-change", (_, layout) => callback(layout)),
     sendChatMessage: (prompt: string) => ipcRenderer.invoke("send-chat-message", prompt),
+    selectText: (text: string) => ipcRenderer.send("find-text", text),
 });
 
 // Add type definitions here
@@ -20,6 +21,7 @@ declare global {
             onUrlLoaded: (callback: () => void) => void;
             onLayoutChange: (callback: (layout: Layout) => void) => void;
             sendChatMessage: (prompt: string) => Promise<string>;
+            selectText: (text: string) => void;
         };
     }
 }

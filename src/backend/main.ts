@@ -142,12 +142,26 @@ app.on("ready", () => {
             height: mainWindow.getContentSize()[1],
         });
         embedView.webContents.loadURL(url);
+        embedView.webContents.insertCSS(`
+            .highlight {
+                background: rgba(252, 232, 180, 0.5);
+            }
+            *:has(> .highlight) {
+                border: 4px solid yellow;
+            }
+        `);
         embedView.webContents.on("dom-ready", async () => {
+            const highlightScript = (await import('./highlight.js?raw')).default
+            embedView.webContents.executeJavaScript(highlightScript);
             uiView.webContents.send("url-loaded");
         });
         layoutViews(mainWindow, uiView, embedView);
         frontendState.currentView = "chatWithWebPage";
     });
+    ipcMain.on('find-text', (_, text) => {
+        const t1 = text.toString().replace(/'/g, "\\'").toLowerCase();
+        embedView.webContents.executeJavaScript(`highlight(document.body, '${t1}')`);
+    })
     ipcMain.handle("send-chat-message", async (_, prompt: string) => {
         console.log("send-chat-message");
         const websiteText =
