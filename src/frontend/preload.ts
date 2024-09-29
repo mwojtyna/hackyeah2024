@@ -6,11 +6,17 @@ import { contextBridge, ipcRenderer } from "electron";
 
 contextBridge.exposeInMainWorld("api", {
     sendInitialUrl: (url: string) => ipcRenderer.send("send-initial-url", url),
+
     onUrlLoaded: (callback: () => void) => ipcRenderer.on("url-loaded", callback),
+
     onLayoutChange: (callback: (layout: Layout) => void) =>
         ipcRenderer.on("layout-change", (_, layout) => callback(layout)),
-    sendChatMessage: (prompt: string) => ipcRenderer.invoke("send-chat-message", prompt),
     selectText: (text: string) => ipcRenderer.send("find-text", text),
+
+    sendChatMessage: (prompt: string) => ipcRenderer.send("send-chat-message", prompt),
+    onChatMessageChunk: (callback: (chunk: string) => void) =>
+        ipcRenderer.on("chat-message-chunk", (_, chunk) => callback(chunk)),
+    onChatMessageEnd: (callback: () => void) => ipcRenderer.on("chat-message-end", callback),
 });
 
 // Add type definitions here
@@ -20,7 +26,9 @@ declare global {
             sendInitialUrl: (url: string) => void;
             onUrlLoaded: (callback: () => void) => void;
             onLayoutChange: (callback: (layout: Layout) => void) => void;
-            sendChatMessage: (prompt: string) => Promise<string>;
+            sendChatMessage: (prompt: string) => void;
+            onChatMessageChunk: (callback: (chunk: string) => void) => void;
+            onChatMessageEnd: (callback: () => void) => void;
             selectText: (text: string) => void;
         };
     }

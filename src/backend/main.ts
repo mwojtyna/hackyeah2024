@@ -151,24 +151,30 @@ app.on("ready", () => {
             }
         `);
         embedView.webContents.on("dom-ready", async () => {
-            const highlightScript = (await import('./highlight.js?raw')).default
+            const highlightScript = (await import("./highlight.js?raw")).default;
             embedView.webContents.executeJavaScript(highlightScript);
             uiView.webContents.send("url-loaded");
         });
         layoutViews(mainWindow, uiView, embedView);
         frontendState.currentView = "chatWithWebPage";
     });
-    ipcMain.on('find-text', (_, text) => {
+    ipcMain.on("find-text", (_, text) => {
         const t1 = text.toString().replace(/'/g, "\\'").toLowerCase();
         embedView.webContents.executeJavaScript(`highlight(document.body, '${t1}')`);
-    })
-    ipcMain.handle("send-chat-message", async (_, prompt: string) => {
+    });
+    ipcMain.on("send-chat-message", async (_, prompt: string) => {
         console.log("send-chat-message");
         const websiteText =
             await embedView.webContents.executeJavaScript("document.body.innerText");
-        const res1 = await website_search_summary(prompt, websiteText);
-        console.log("send-chat-message response");
-        return res1;
+        const generator = await website_search_summary(prompt, websiteText);
+
+        console.log("send-chat-message response begin");
+        for await (const chunk of generator) {
+            uiView.webContents.send("chat-message-chunk", chunk);
+        }
+        console.log("send-chat-message response finished");
+        uiView.webContents.send("chat-message-end");
+
         // console.log(res1);
         //const res2 = await extract_info_json("find me a contact info for a mentor support", res1)
         //console.log("res2", res2);

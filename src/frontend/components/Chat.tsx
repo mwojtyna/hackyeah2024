@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { CornerDownLeft, LoaderCircle, Mic } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { State } from "@/types/state";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
@@ -18,11 +18,11 @@ function ChatBubble({ message, sender }: ChatMessage) {
     return (
         <div
             onMouseUp={() => {
-                if (sender != "ai") return
+                if (sender != "ai") return;
 
-                console.log('asdf')
-                const selection = window.getSelection().toString()
-                window.api.selectText(selection)
+                console.log("asdf");
+                const selection = window.getSelection().toString();
+                window.api.selectText(selection);
             }}
             className={cn(
                 "px-4 py-2 text-white rounded-lg whitespace-pre-line",
@@ -37,18 +37,19 @@ function ChatBubble({ message, sender }: ChatMessage) {
 
 function DotsLoading() {
     return (
-        <div>
+        <>
             {Array(3)
                 .fill(undefined)
                 .map((_, i) => (
                     <span
+                        key={i}
                         className="inline-block animate-bounce h-3"
                         style={{ animationDelay: `${i * 50}ms` }}
                     >
                         .
                     </span>
                 ))}
-        </div>
+        </>
     );
 }
 
@@ -62,21 +63,42 @@ export function Chat({
     const [layout, setLayout] = useState<Layout>("landscape");
     useEffect(() => {
         window.api.onLayoutChange((newLayout) => setLayout(newLayout));
-        return () => window.api.onLayoutChange(() => { });
+        return () => window.api.onLayoutChange(() => {});
     }, []);
 
     const [input, setInput] = useState("");
     const [bubbles, setBubbles] = useState<ChatMessage[]>([]);
+    const [isStreamingResponse, setIsStreamingResponse] = useState(false);
+    const [newMessage, setNewMessage] = useState("");
+    const newMessageRef = useRef("");
+
     const mutation = useMutation({
         mutationFn: async (msg: string) => {
             setInput("");
             setBubbles((bubbles) => [...bubbles, { message: msg, sender: "user" }]);
-            return window.api.sendChatMessage(msg);
-        },
-        onSuccess: (res) => {
-            setBubbles((bubbles) => [...bubbles, { message: res, sender: "ai" }]);
+            window.api.sendChatMessage(msg);
+            setIsStreamingResponse(true);
         },
     });
+
+    useEffect(() => {
+        window.api.onChatMessageChunk((chunk) => {
+            setNewMessage((msg) => {
+                const updatedMessage = msg + chunk;
+                newMessageRef.current = updatedMessage;
+                return updatedMessage;
+            });
+        });
+        window.api.onChatMessageEnd(() => {
+            setIsStreamingResponse(false);
+            setBubbles((bubbles) => [...bubbles, { message: newMessageRef.current, sender: "ai" }]);
+        });
+
+        return () => {
+            window.api.onChatMessageChunk(() => {});
+            window.api.onChatMessageEnd(() => {});
+        };
+    }, []);
 
     return (
         <div
@@ -90,7 +112,12 @@ export function Chat({
                     <ChatBubble key={i} message={bubble.message} sender={bubble.sender} />
                 ))}
 
-                {mutation.isPending && <ChatBubble message={<DotsLoading />} sender={"ai"} />}
+                {isStreamingResponse && newMessage === "" && (
+                    <ChatBubble message={<DotsLoading />} sender={"ai"} />
+                )}
+                {isStreamingResponse && newMessage !== "" && (
+                    <ChatBubble message={newMessage} sender={"ai"} />
+                )}
             </div>
 
             <form
@@ -113,7 +140,7 @@ export function Chat({
                     onKeyDown={(e) => {
                         if (e.key == "Enter" && !e.shiftKey) {
                             e.preventDefault();
-                            if (input.trim() !== "" && !mutation.isPending) {
+                            if (input.trim() !== "" && !isStreamingResponse) {
                                 mutation.mutate(input);
                             }
                         }
@@ -134,7 +161,7 @@ export function Chat({
                         type="submit"
                         size="sm"
                         className="ml-auto gap-1.5 disabled:opacity-50"
-                        disabled={mutation.isPending}
+                        disabled={isStreamingResponse}
                     >
                         Send Message
                         <CornerDownLeft className="size-3.5" />
