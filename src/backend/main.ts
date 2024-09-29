@@ -74,9 +74,9 @@ function createWindow(): {
     });
 
     // Open the DevTools.
-    if (process.env.NODE_ENV !== "Release") {
+    if (process.env.NODE_ENV !== "Release" && !process.env.PROD) {
         uiView.webContents.openDevTools({ mode: "detach" });
-        //embedView.webContents.openDevTools({ mode: "detach" });
+        embedView.webContents.openDevTools({ mode: "detach" });
     }
 
     return {
