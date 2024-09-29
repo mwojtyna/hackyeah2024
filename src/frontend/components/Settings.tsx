@@ -35,7 +35,7 @@ export function Settings({
             >
                 <XIcon size={32} />
             </Button>
-            <h1 className="text-4xl font-bold">Settigns</h1>
+            <h1 className="text-4xl font-bold">Settings</h1>
             <div className="mt-8">
                 <h2 className="text-xl font-bold">Ollama host url</h2>
                 <div className="flex gap-4 mt-1">

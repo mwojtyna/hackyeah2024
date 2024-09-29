@@ -2,12 +2,12 @@ import { State } from "@/types/state";
 import { ipcMain } from "electron";
 import { Ollama } from "ollama";
 
-const defaultHost = (new State()).ollamaURL.toString()
+const defaultHost = new State().ollamaURL.toString();
 let ollama = new Ollama({ host: defaultHost });
 
-ipcMain.on('set-ollama-url', (_e, url: string) => {
+ipcMain.on("set-ollama-url", (_e, url: string) => {
     ollama = new Ollama({ host: url });
-})
+});
 
 async function ask(recipe: string, prompt: string, config: {} = {}) {
     return (
