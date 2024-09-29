@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { CornerDownLeft, LoaderCircle, Mic } from "lucide-react";
+import { CornerDownLeft, Mic } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { State } from "@/types/state";
 import { Button } from "./ui/button";
@@ -71,15 +71,24 @@ export function Chat({
     const [isStreamingResponse, setIsStreamingResponse] = useState(false);
     const [newMessage, setNewMessage] = useState("");
     const newMessageRef = useRef("");
-
     const mutation = useMutation({
         mutationFn: async (msg: string) => {
             setInput("");
             setBubbles((bubbles) => [...bubbles, { message: msg, sender: "user" }]);
+            setTimeout(
+                () =>
+                    bubblesContainerRef.current.scrollTo({
+                        top: 99999,
+                        behavior: "smooth",
+                    }),
+                100,
+            );
             window.api.sendChatMessage(msg);
             setIsStreamingResponse(true);
         },
     });
+
+    const bubblesContainerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         window.api.onChatMessageChunk((chunk) => {
@@ -88,6 +97,19 @@ export function Chat({
                 newMessageRef.current = updatedMessage;
                 return updatedMessage;
             });
+
+            const ref = bubblesContainerRef.current;
+            console.log(ref.scrollTop, ref.scrollHeight - ref.offsetHeight);
+            if (ref.scrollTop > ref.scrollHeight - ref.offsetHeight - 100) {
+                setTimeout(
+                    () =>
+                        ref.scrollTo({
+                            top: 99999,
+                            behavior: "smooth",
+                        }),
+                    100,
+                );
+            }
         });
         window.api.onChatMessageEnd(() => {
             setIsStreamingResponse(false);
@@ -112,7 +134,7 @@ export function Chat({
                 layout == "landscape" ? "border-r" : "border-t",
             )}
         >
-            <div className="flex flex-col gap-4 overflow-auto">
+            <div className="flex flex-col gap-4 overflow-auto" ref={bubblesContainerRef}>
                 {bubbles.map((bubble, i) => (
                     <ChatBubble key={i} message={bubble.message} sender={bubble.sender} />
                 ))}
