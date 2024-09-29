@@ -108,11 +108,11 @@ export function Chat({
     return (
         <div
             className={cn(
-                "flex h-full w-full flex-col p-4 justify-between",
+                "grid grid-flow-row grid-rows-[1fr_auto] h-full w-full flex-col gap-4 p-4 ",
                 layout == "landscape" ? "border-r" : "border-t",
             )}
         >
-            <div className="flex flex-col max-h-[80%] gap-4 overflow-auto">
+            <div className="flex flex-col gap-4 overflow-auto">
                 {bubbles.map((bubble, i) => (
                     <ChatBubble key={i} message={bubble.message} sender={bubble.sender} />
                 ))}
