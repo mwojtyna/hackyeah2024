@@ -14,7 +14,7 @@ export function Router() {
         case "loading":
             return <Loading state={state} updateState={setState} />;
         case "chatWithWebPage":
-            return <Chat state={state} updateState={setState} />;
+            return <Chat />;
         case "settings":
             return <Settings state={state} updateState={setState} />;
         default:

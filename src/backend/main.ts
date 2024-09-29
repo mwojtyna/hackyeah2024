@@ -72,6 +72,9 @@ function createWindow(): {
             }
         }
     });
+    embedView.webContents.on("did-navigate", () => {
+        uiView.webContents.send("url-changed", embedView.webContents.getURL());
+    });
 
     // Open the DevTools.
     if (process.env.NODE_ENV !== "Release" && !process.env.PROD) {
@@ -154,6 +157,7 @@ app.on("ready", () => {
             const highlightScript = (await import("./highlight.js?raw")).default;
             embedView.webContents.executeJavaScript(highlightScript);
             uiView.webContents.send("url-loaded");
+            uiView.webContents.send("url-changed", embedView.webContents.getURL());
         });
         layoutViews(mainWindow, uiView, embedView);
         frontendState.currentView = "chatWithWebPage";
@@ -178,6 +182,20 @@ app.on("ready", () => {
         // console.log(res1);
         //const res2 = await extract_info_json("find me a contact info for a mentor support", res1)
         //console.log("res2", res2);
+    });
+    ipcMain.on("go-back", () => {
+        embedView.webContents.navigationHistory.goBack();
+        uiView.webContents.send("url-changed", embedView.webContents.getURL());
+    });
+    ipcMain.on("go-forward", () => {
+        embedView.webContents.navigationHistory.goForward();
+        uiView.webContents.send("url-changed", embedView.webContents.getURL());
+    });
+    ipcMain.on("reload", () => {
+        embedView.webContents.reloadIgnoringCache();
+    });
+    ipcMain.on("change-url", (_, url: string) => {
+        embedView.webContents.loadURL(url);
     });
 });
 

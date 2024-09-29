@@ -1,13 +1,13 @@
 import { useMutation } from "@tanstack/react-query";
 import { CornerDownLeft, Mic } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { State } from "@/types/state";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { cn } from "../utils";
 import { Layout } from "@/types/shared";
+import { Navigation } from "./Navigation";
 
 type ChatMessage = {
     message: React.ReactNode;
@@ -53,13 +53,7 @@ function DotsLoading() {
     );
 }
 
-export function Chat({
-    state,
-    updateState,
-}: {
-    state: State;
-    updateState: React.Dispatch<React.SetStateAction<State>>;
-}) {
+export function Chat() {
     const [layout, setLayout] = useState<Layout>("landscape");
     useEffect(() => {
         window.api.onLayoutChange((newLayout) => setLayout(newLayout));
@@ -130,10 +124,12 @@ export function Chat({
     return (
         <div
             className={cn(
-                "grid grid-flow-row grid-rows-[1fr_auto] h-full w-full flex-col gap-4 p-4 ",
+                "grid grid-flow-row grid-rows-[auto_1fr_auto] h-full w-full flex-col gap-4 p-4 ",
                 layout == "landscape" ? "border-r" : "border-t",
             )}
         >
+            <Navigation />
+
             <div className="flex flex-col gap-4 overflow-auto" ref={bubblesContainerRef}>
                 {bubbles.map((bubble, i) => (
                     <ChatBubble key={i} message={bubble.message} sender={bubble.sender} />

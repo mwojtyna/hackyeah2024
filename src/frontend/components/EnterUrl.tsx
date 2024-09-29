@@ -13,22 +13,24 @@ export function EnterUrlScreen({
 }) {
     const inputRef = useRef<HTMLInputElement | null>(null);
     const submitCb = useCallback(() => {
-        try {
-            state.webPageURL = new URL(inputRef.current.value);
-            state.currentView = "loading";
-        } catch {
-            console.error("wrong url");
+        let url = inputRef.current.value;
+        if (!url.startsWith("https://") && !url.startsWith("http://")) {
+            url = "https://" + url;
         }
+        state.currentView = "loading";
         updateState({ ...state });
-        window.api.sendInitialUrl(state.webPageURL.toString());
+        window.api.sendInitialUrl(url);
     }, []);
 
     return (
         <div className="w-screen h-screen flex flex-col justify-center items-center">
-            <Button className="absolute left-4 top-4 size-10 p-3" onClick={() => {
-                state.currentView = "settings"
-                updateState({ ...state })
-            }}>
+            <Button
+                className="absolute left-4 top-4 size-10 p-3"
+                onClick={() => {
+                    state.currentView = "settings";
+                    updateState({ ...state });
+                }}
+            >
                 <Settings size={32} />
             </Button>
             <h1 className="mx-auto text-5xl font-bold">Better Web</h1>

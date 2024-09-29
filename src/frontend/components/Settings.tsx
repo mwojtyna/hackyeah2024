@@ -1,4 +1,4 @@
-import { Cross, Key, Link, XIcon } from "lucide-react";
+import { Link, XIcon } from "lucide-react";
 import React, { useCallback, useRef } from "react";
 import { State } from "../../types/state";
 import { Button } from "./ui/button";
@@ -15,8 +15,8 @@ export function Settings({
     const submitCb = useCallback(() => {
         try {
             if (inputRef.current.value) {
-                state.ollamaURL = new URL(inputRef.current.value);
-                window.api.setOllamaURL(inputRef.current.value)
+                state.ollamaURL = inputRef.current.value;
+                window.api.setOllamaURL(inputRef.current.value);
                 updateState({ ...state });
             }
         } catch {
@@ -26,10 +26,13 @@ export function Settings({
 
     return (
         <div className="w-screen h-screen flex flex-col justify-center items-center">
-            <Button className="absolute left-4 top-4 size-10 p-3" onClick={() => {
-                state.currentView = "enterURL"
-                updateState({ ...state })
-            }}>
+            <Button
+                className="absolute left-4 top-4 size-10 p-3"
+                onClick={() => {
+                    state.currentView = "enterURL";
+                    updateState({ ...state });
+                }}
+            >
                 <XIcon size={32} />
             </Button>
             <h1 className="text-4xl font-bold">Settigns</h1>

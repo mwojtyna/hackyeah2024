@@ -2,12 +2,10 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
 import { Layout } from "@/types/shared";
-import { State } from "@/types/state";
 import { contextBridge, ipcRenderer } from "electron";
 
 contextBridge.exposeInMainWorld("api", {
     sendInitialUrl: (url: string) => ipcRenderer.send("send-initial-url", url),
-
     onUrlLoaded: (callback: () => void) => ipcRenderer.on("url-loaded", callback),
 
     onLayoutChange: (callback: (layout: Layout) => void) =>
@@ -19,6 +17,13 @@ contextBridge.exposeInMainWorld("api", {
     onChatMessageChunk: (callback: (chunk: string) => void) =>
         ipcRenderer.on("chat-message-chunk", (_, chunk) => callback(chunk)),
     onChatMessageEnd: (callback: () => void) => ipcRenderer.on("chat-message-end", callback),
+
+    goBack: () => ipcRenderer.send("go-back"),
+    goForward: () => ipcRenderer.send("go-forward"),
+    reload: () => ipcRenderer.send("reload"),
+    changeUrl: (url: string) => ipcRenderer.send("change-url", url),
+    onUrlChanged: (callback: (url: string) => void) =>
+        ipcRenderer.on("url-changed", (_, url) => callback(url)),
 });
 
 // Add type definitions here
@@ -33,6 +38,11 @@ declare global {
             onChatMessageEnd: (callback: () => void) => void;
             selectText: (text: string) => void;
             setOllamaURL: (url: string) => void;
+            goBack: () => void;
+            goForward: () => void;
+            reload: () => void;
+            changeUrl: (url: string) => void;
+            onUrlChanged: (callback: (url: string) => void) => void;
         };
     }
 }
