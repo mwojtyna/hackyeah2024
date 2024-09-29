@@ -25,23 +25,29 @@ async function record() {
 		frames.push(frame);
 	}
 
+	recorder.stop()
+
+	console.log("stopped recording")
+	
 	const audiodata = new Int16Array(recorder.frameLength * frames.length);
 	for (let i = 0; i < frames.length; i++) {
 		audiodata.set(frames[i], i * recorder.frameLength);
 	}
+	
 	wav.fromScratch(1, recorder.sampleRate, '16', audiodata);
 	var filename = path.join(os.tmpdir(), `recordedAudio.wav`);
 	fs.writeFileSync(filename, wav.toBuffer());
-	recorder.stop()
 	recorder.release();
 }
 
-(async function () {
-	try {
-		recording_mutex.acquire();
-		record();
-		await sleep(5000); // replace with user action
+export async function record_audio() {
+	if (recording_mutex.isLocked()) {
 		recording_mutex.release();
+	} else {
+		try {
+			recording_mutex.acquire();
+			record();
+		}
+		catch {}
 	}
-	catch {}
-})();
+}

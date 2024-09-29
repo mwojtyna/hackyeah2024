@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { cn } from "../utils";
 import { Layout } from "@/types/shared";
 import { Navigation } from "./Navigation";
+import { record_audio } from "@/backend/audio_recorder"
 
 type ChatMessage = {
     message: React.ReactNode;
@@ -173,7 +174,7 @@ export function Chat() {
                 <div className="flex items-center p-2 pt-0">
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon">
+                            <Button variant="ghost" size="icon" onClick={ record_audio }>
                                 <Mic className="size-4" />
                                 <span className="sr-only">Use Microphone</span>
                             </Button>
