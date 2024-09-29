@@ -3,9 +3,11 @@ import { app, BrowserWindow, ipcMain, WebContentsView } from "electron";
 import { extract_info_json, website_search_summary } from "@/backend/ai";
 import path from "path";
 import { State } from "../types/state";
+// @ts-expect-error -> In vite there are no types for the following line. Electron forge error
+import started from "electron-squirrel-startup";
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require("electron-squirrel-startup")) {
+if (started) {
     app.quit();
 }
 
@@ -77,8 +79,8 @@ function createWindow(): {
     });
 
     // Open the DevTools.
-    if (process.env.NODE_ENV !== "Release" && !process.env.PROD) {
-        uiView.webContents.openDevTools({ mode: "detach" });
+    if (process.env.NODE_ENV !== "production") {
+        // uiView.webContents.openDevTools({ mode: "detach" });
         // embedView.webContents.openDevTools({ mode: "detach" });
     }
 
