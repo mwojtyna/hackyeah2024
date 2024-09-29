@@ -2,6 +2,7 @@
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
 
 import { Layout } from "@/types/shared";
+import { State } from "@/types/state";
 import { contextBridge, ipcRenderer } from "electron";
 
 contextBridge.exposeInMainWorld("api", {
@@ -12,6 +13,7 @@ contextBridge.exposeInMainWorld("api", {
     onLayoutChange: (callback: (layout: Layout) => void) =>
         ipcRenderer.on("layout-change", (_, layout) => callback(layout)),
     selectText: (text: string) => ipcRenderer.send("find-text", text),
+    setOllamaURL: (url: string) => ipcRenderer.send("set-ollama-url", url),
 
     sendChatMessage: (prompt: string) => ipcRenderer.send("send-chat-message", prompt),
     onChatMessageChunk: (callback: (chunk: string) => void) =>
@@ -30,6 +32,7 @@ declare global {
             onChatMessageChunk: (callback: (chunk: string) => void) => void;
             onChatMessageEnd: (callback: () => void) => void;
             selectText: (text: string) => void;
+            setOllamaURL: (url: string) => void;
         };
     }
 }

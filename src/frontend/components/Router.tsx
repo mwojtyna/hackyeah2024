@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Chat } from "./Chat";
 import { EnterUrlScreen } from "./EnterUrl";
 import { Loading } from "./Loading";
+import { Settings } from "./Settings";
 
 export function Router() {
     const [state, setState] = useState(new State());
@@ -14,6 +15,8 @@ export function Router() {
             return <Loading state={state} updateState={setState} />;
         case "chatWithWebPage":
             return <Chat state={state} updateState={setState} />;
+        case "settings":
+            return <Settings state={state} updateState={setState} />;
         default:
             return null;
     }

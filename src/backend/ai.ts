@@ -1,6 +1,13 @@
-import { ChatResponse, Ollama } from "ollama";
+import { State } from "@/types/state";
+import { ipcMain } from "electron";
+import { Ollama } from "ollama";
 
-const ollama = new Ollama({ host: "http://hy24.plasny.one:80" });
+const defaultHost = (new State()).ollamaURL.toString()
+let ollama = new Ollama({ host: defaultHost });
+
+ipcMain.on('set-ollama-url', (_e, url: string) => {
+    ollama = new Ollama({ host: url });
+})
 
 async function ask(recipe: string, prompt: string, config: {} = {}) {
     return (
