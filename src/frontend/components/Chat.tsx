@@ -92,6 +92,11 @@ export function Chat({
         window.api.onChatMessageEnd(() => {
             setIsStreamingResponse(false);
             setBubbles((bubbles) => [...bubbles, { message: newMessageRef.current, sender: "ai" }]);
+            setNewMessage(() => {
+                const val = "";
+                newMessageRef.current = val;
+                return val;
+            });
         });
 
         return () => {
